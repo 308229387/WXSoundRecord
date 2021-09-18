@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -17,7 +16,6 @@ import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +36,12 @@ public class WXVoiceButton extends View {
     private Paint txtPaint;
 
     List<DrawLine> drawLines = new ArrayList<>();
-    private int LINE_WIDTH = 10; //音量条的宽度
-    private int LINE_SPACE = 10;
+    private int LINE_WIDTH = 4; //音量条的宽度
+    private int LINE_SPACE = 4; //两条之间的距离
 
     LineHandler lineHandler;
 
-    private int DURATION = 400;
+    private int DURATION = 600; //动画时间
     private Interpolator mInterpolator = new BounceInterpolator();
 
     private final float initWidthRotas = 0.42f;//最开始显示的宽度占控件整个宽度的比例
@@ -191,7 +189,7 @@ public class WXVoiceButton extends View {
     private static final int WHAT_CHANGE_VOICE_SIZE = 3;//驱动音量条高低变化的事件
     private static final int WHAT_CHECK_VOICE = 4;//驱动进入巡检模式的事件
 
-    private static int[] checkModeItemSize = new int[]{15, 20, 25, 30, 25, 20, 15};
+    private static int[] checkModeItemSize = new int[]{20, 30, 40, 50, 40, 30, 20}; //监听线高度
     private int checkStarIndex = 0;
     private boolean isCheckMode = false;
 
@@ -230,9 +228,9 @@ public class WXVoiceButton extends View {
 
                         lineSize = Math.max(lineSize, 10);//对最小值进行过滤
                         RectF rectF = drawLine.rectF;
-                        rectF.top = (-lineSize * 1.0f / 6)-10;
-                        rectF.bottom = (lineSize * 1.0f / 6)+10;
-                        Log.d("song_test","rectF.top = "+rectF.top+"            rectF.bottom = "+rectF.bottom);
+                        rectF.top = (-lineSize * 1.0f / 6) - 4;
+                        rectF.bottom = (lineSize * 1.0f / 6) + 4;
+                        Log.d("song_test", "rectF.top = " + rectF.top + "            rectF.bottom = " + rectF.bottom);
 
                         drawLine.lineSize = lineSize;
                     }
@@ -290,8 +288,8 @@ public class WXVoiceButton extends View {
                         } else {
                             drawLine.lineSize = 10;
                         }
-                        drawLine.rectF.top = (-drawLine.lineSize / 6)-10;
-                        drawLine.rectF.bottom = (drawLine.lineSize / 6)+10;
+                        drawLine.rectF.top = (-drawLine.lineSize / 6) - 4;
+                        drawLine.rectF.bottom = (drawLine.lineSize / 6) + 4;
 
                     }
                     checkStarIndex--;
