@@ -32,8 +32,6 @@ public class WXVoiceButton extends View {
 
     private final int MIN_VOICE_SIZE = 20;
     private Paint linePaint;
-    private Paint bgPaint;
-    private Paint txtPaint;
 
     List<DrawLine> drawLines = new ArrayList<>();
     private int LINE_WIDTH = 4; //音量条的宽度
@@ -44,16 +42,8 @@ public class WXVoiceButton extends View {
     private int DURATION = 600; //动画时间
     private Interpolator mInterpolator = new BounceInterpolator();
 
-    private final float initWidthRotas = 0.42f;//最开始显示的宽度占控件整个宽度的比例
-    private final float maxWidthRotas = 0.8f;//最大显示宽度
-    private float widthRotas = initWidthRotas;//当前显示的宽度
 
-    private int bgRound = 15;//背景圆角的大小,单位dp
-    private int showWidth = 0;//显示的宽度
-    private Rect textRect = new Rect();
     private volatile boolean quit = false;
-    private String cancelBgColor = "#F85050";
-    private String normalBgColor = "#EFEFEF";
 
     public WXVoiceButton(Context context) {
         super(context);
@@ -62,27 +52,11 @@ public class WXVoiceButton extends View {
     public WXVoiceButton(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         linePaint = new Paint();
-        linePaint.setColor(Color.parseColor("#000000"));
+        linePaint.setColor(Color.parseColor("#000000")); //线的颜色
         linePaint.setStyle(Paint.Style.FILL);
         linePaint.setStrokeCap(Paint.Cap.ROUND);
         linePaint.setStrokeJoin(Paint.Join.ROUND);
 
-        bgPaint = new Paint();
-        bgPaint.setColor(Color.parseColor(normalBgColor));
-        bgPaint.setStyle(Paint.Style.FILL);
-        bgPaint.setStrokeCap(Paint.Cap.ROUND);
-        bgPaint.setStrokeJoin(Paint.Join.ROUND);
-        bgPaint.setAntiAlias(true);
-        bgRound = dip2px(context, bgRound);
-
-
-        txtPaint = new Paint();
-        txtPaint.setColor(Color.parseColor("#000000"));
-        txtPaint.setStyle(Paint.Style.FILL);
-        txtPaint.setStrokeCap(Paint.Cap.ROUND);
-        txtPaint.setStrokeJoin(Paint.Join.ROUND);
-        txtPaint.setTextSize(dip2px(context, 14));
-        txtPaint.setAntiAlias(true);
 
 
         buildDrawLines();
@@ -105,13 +79,6 @@ public class WXVoiceButton extends View {
         int duration = 0;
     }
 
-    public void setCancel(boolean cancel) {
-        if (cancel) {
-            bgPaint.setColor(Color.parseColor(cancelBgColor));
-        } else {
-            bgPaint.setColor(Color.parseColor(normalBgColor));
-        }
-    }
 
     /**
      * 每条音频线能显示的最大值与showVoiceSize的比值
@@ -136,26 +103,6 @@ public class WXVoiceButton extends View {
     }
 
 
-    /**
-     * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
-     */
-    private static int dip2px(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
-    }
-
-    private boolean showText = false;
-    private String content = null;
-
-    public void setContent(String content) {
-        showText = true;
-        this.content = content;
-        txtPaint.getTextBounds(content, 0, content.length(), textRect);
-        //lineHandler.removeMessages(1);
-        //lineHandler.removeMessages(2);
-        // invalidate();
-    }
-
     private boolean toBig = true;
 
     /**
@@ -164,7 +111,7 @@ public class WXVoiceButton extends View {
      * @param voiceSize
      */
     public void addVoiceSize(int voiceSize) {
-        // showVoiceSize = Math.max(MIN_VOICE_SIZE, voiceSize);
+        Log.d("song_test","voiceSize = "+voiceSize);
         Message message = Message.obtain();
         message.obj = voiceSize;
         message.what = WHAT_CHANGE_VOICE_SIZE;
@@ -176,13 +123,6 @@ public class WXVoiceButton extends View {
             toBig = false;
         }
     }
-
-
-    public void setInterpolator(Interpolator mInterpolator) {
-        this.mInterpolator = mInterpolator;
-    }
-
-    private int showVoiceSize = 40;
 
     private static final int WHAT_ANIMATION = 1;//驱动动画的事件
     private static final int WHAT_BIG = 2;//驱动变宽的事件
@@ -230,23 +170,12 @@ public class WXVoiceButton extends View {
                         RectF rectF = drawLine.rectF;
                         rectF.top = (-lineSize * 1.0f / 6) - 4;
                         rectF.bottom = (lineSize * 1.0f / 6) + 4;
-                        Log.d("song_test", "rectF.top = " + rectF.top + "            rectF.bottom = " + rectF.bottom);
 
                         drawLine.lineSize = lineSize;
                     }
                     invalidate();//更新UI
                     removeMessages(WHAT_ANIMATION);
                     sendEmptyMessageDelayed(WHAT_ANIMATION, 16);
-                    break;
-                case WHAT_BIG:
-
-                    //改变宽度
-                    if (widthRotas < maxWidthRotas) {
-                        widthRotas += 0.005f;
-                        showWidth = (int) (getWidth() * widthRotas);
-                        invalidate();
-                        lineHandler.sendEmptyMessageDelayed(WHAT_BIG, 500);
-                    }
                     break;
                 case WHAT_CHANGE_VOICE_SIZE:
                     int voiceSize = (int) msg.obj;
@@ -316,30 +245,19 @@ public class WXVoiceButton extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        showWidth = (int) (widthRotas * w);
         lineHandler.sendEmptyMessage(WHAT_ANIMATION);
-
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
         canvas.translate(getWidth() / 2, getHeight() / 2);
-        //画背景
-        canvas.drawRoundRect(-showWidth / 2, -getHeight() / 2, showWidth / 2, getHeight() / 2, bgRound, bgRound, bgPaint);
-        if (showText) {
-            int txtHeight = textRect.height() / 2;
-            int txtWidth = textRect.width() / 2;
-            canvas.drawText(content, -txtWidth, txtHeight, txtPaint);
-        } else {
             float offsetX = (drawLines.size() - 1) * 1.0f / 2 * (LINE_WIDTH + LINE_SPACE);
             canvas.translate(-offsetX, 0);
             for (DrawLine drawLine : drawLines) {
                 canvas.drawRoundRect(drawLine.rectF, 5, 5, linePaint);
                 canvas.translate(LINE_WIDTH + LINE_SPACE, 0);
             }
-
-        }
         canvas.restore();
     }
 

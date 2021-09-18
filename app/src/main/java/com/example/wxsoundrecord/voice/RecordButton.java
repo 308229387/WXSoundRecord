@@ -109,10 +109,10 @@ public class RecordButton extends AppCompatButton {
         moveY = (int) (event.getY() - downY);
         if (mStateTV != null && wxVoiceButton != null && moveY < 0 && moveY < -20) {
             mStateTV.setText("松开手指,取消发送");
-            wxVoiceButton.setCancel(true);
+//            wxVoiceButton.setCancel(true);
         } else if (mStateTV != null && wxVoiceButton != null) {
             mStateTV.setText("手指上滑,取消发送");
-            wxVoiceButton.setCancel(false);
+//            wxVoiceButton.setCancel(false);
         }
         switch (action) {
             case MotionEvent.ACTION_DOWN:
@@ -378,7 +378,7 @@ public class RecordButton extends AppCompatButton {
                 //少于十秒则提醒
                 long lessTime = (MAX_INTERVAL_TIME - useTime) / 1000;
                 if (lessTime < 10) {
-                    wxVoiceButton.setContent(lessTime + "秒后将结束录音");
+//                    wxVoiceButton.setContent(lessTime + "秒后将结束录音");
                     if (firstNotice) {
                         firstNotice = false;//第一次需要震动
                         Vibrator vibrator = (Vibrator) getContext().getSystemService(getContext().VIBRATOR_SERVICE);
